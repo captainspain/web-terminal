@@ -1,0 +1,23 @@
+{
+    "name": "captainspain/web-terminal",
+    "license": "proprietary",
+    "description": "Terminal inside your browser",
+    "authors": [
+        {
+            "name": "Daniel Ravenshorst",
+            "email": "captainspain99@gmail.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^2.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "CaptainSpain\\WebTerminal\\": "src/WebTerminal/"
+        },
+        "files": ["src/helpers.php"]
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^4.1"
+    }
+}
