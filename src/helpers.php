@@ -1,7 +1,6 @@
 <?php
 
-if (!function_exists('env'))
-{
+if (!function_exists('env')) {
     /**
      * @param string $envKey
      * @param mixed|null $default
@@ -15,8 +14,7 @@ if (!function_exists('env'))
     }
 }
 
-if (!function_exists('templates_dir'))
-{
+if (!function_exists('templates_dir')) {
     /**
      * @param string $path
      * @return string
