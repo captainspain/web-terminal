@@ -6,7 +6,7 @@ function makeInputLine($data, $fromData = true)
 {
     $command = '';
     $response = '';
-    $operator = $data['is_sudo'] ? '#' : '$';
+    $operator = $data['isSudo'] ? '#' : '$';
     if ($fromData) {
         $command = $data['command'];
         if (!contains('cd ', $command)) {
