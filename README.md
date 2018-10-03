@@ -9,7 +9,7 @@ git clone git@github.com:captainspain/web-terminal.git
 ```
 2. Run composer install inside this project:
 ```
-cd web-terminal
+cd web-terminal/
 composer install
 ````
 3. Copy the `.env.example` and change it to your settings.
