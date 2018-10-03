@@ -9,6 +9,8 @@
         }
     ],
     "require": {
+        "php": "^7.2",
+        "ext-json": "*",
         "vlucas/phpdotenv": "^2.5"
     },
     "autoload": {
