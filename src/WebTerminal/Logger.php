@@ -25,7 +25,7 @@ class Logger
     private function loadData(): void
     {
         $filePath = $this->filePath;
-        if (($json = file_get_contents($filePath)) === false) {
+        if (($json = @file_get_contents($filePath)) === false) {
             $json = '{}';
         }
 
