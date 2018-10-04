@@ -1,25 +1,33 @@
 {
-    "name": "captainspain/web-terminal",
-    "license": "proprietary",
-    "description": "Terminal inside your browser",
-    "authors": [
-        {
-            "name": "Daniel Ravenshorst",
-            "email": "captainspain99@gmail.com"
-        }
-    ],
-    "require": {
-        "php": "^7.2",
-        "ext-json": "*",
-        "vlucas/phpdotenv": "^2.5"
-    },
-    "autoload": {
-        "psr-4": {
-            "CaptainSpain\\WebTerminal\\": "src/WebTerminal/"
-        },
-        "files": ["src/helpers.php"]
-    },
-    "require-dev": {
-        "symfony/var-dumper": "^4.1"
+  "name": "captainspain/web-terminal",
+  "license": "proprietary",
+  "description": "Terminal inside your browser",
+  "authors": [
+    {
+      "name": "Daniel Ravenshorst",
+      "email": "captainspain99@gmail.com"
     }
+  ],
+  "require": {
+    "php": "^7.2",
+    "ext-json": "*",
+    "vlucas/phpdotenv": "^2.5"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7.3",
+    "symfony/var-dumper": "^4.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "CaptainSpain\\WebTerminal\\": "src/WebTerminal/"
+    },
+    "files": [
+      "src/helpers.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "CaptainSpain\\WebTerminal\\Tests\\": "tests"
+    }
+  }
 }
