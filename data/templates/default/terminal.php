@@ -16,7 +16,7 @@ function makeInputLine($data, $fromData = true)
         $responseData = $data['response'] ?? [];
         $response = '';
         foreach ($responseData as $line) {
-            $line = $line === '' ? '&nbsp;' : $line;
+            $line = $line === '' ? '&nbsp;' : htmlentities($line);
             $response .= '<span class="new-line" style="display:block">' . $line . '</span>';
         }
         $response = '<span class="response">' . $response . '</span>';
