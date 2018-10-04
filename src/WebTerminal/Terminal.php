@@ -101,7 +101,7 @@ class Terminal
             $path = str_replace('cd ', '', $command);
             $data['root'] = $this->normalizeRoot(getcwd());
             $data['response'] = [''];
-            if (chdir($path)) {
+            if (@chdir($path)) {
                 $this->request->session->set('root', getcwd());
             } else {
                 $data['response'] = ['sh: 1: cd: test: No such file or directory'];
