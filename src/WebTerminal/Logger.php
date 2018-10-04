@@ -11,9 +11,10 @@ class Logger
 
     /**
      * Logger constructor.
-     * @param $filePath
+     *
+     * @param string $filePath
      */
-    public function __construct($filePath)
+    public function __construct(string $filePath)
     {
         $this->filePath = $filePath;
         $this->loadData();
@@ -24,18 +25,20 @@ class Logger
      */
     private function loadData(): void
     {
-        $filePath = $this->filePath;
-        if (($json = file_get_contents($filePath)) === false) {
-            $json = '{}';
-        }
+        try {
+            $file = new \SplFileObject($this->filePath);
+            $content = $file->fread($file->getSize());
 
-        $this->data = json_decode($json, true) ?? [];
+            $this->data = json_decode($content, true) ?? [];
+        } catch (\Exception $e) {
+            $this->data = [];
+        }
     }
 
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }
@@ -57,7 +60,13 @@ class Logger
     public function save(): void
     {
         $data = $this->data;
-        file_put_contents($this->filePath, json_encode($data, JSON_FORCE_OBJECT));
+
+        try {
+            $file = new \SplFileObject($this->filePath);
+            $file->fwrite(json_encode($data, JSON_FORCE_OBJECT));
+        } catch (\Exception $e) {
+
+        }
     }
 
     /**
