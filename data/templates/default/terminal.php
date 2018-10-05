@@ -1,7 +1,13 @@
 <?php
 
 /** @var $this \CaptainSpain\WebTerminal\Terminal */
+/** @var $promptData array */
 
+/**
+ * @param $data
+ * @param bool $fromData
+ * @return string
+ */
 function makeInputLine($data, $fromData = true)
 {
     $command = '';
@@ -34,36 +40,7 @@ HTML;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><?= env('APP_NAME') ?> - CaptainSpain</title>
-    <style>
-        html {
-            height: 100%;
-            margin: 0;
-        }
-        body {
-            padding: 5px;
-        }
-        #console {
-            /*height: 100%;*/
-        }
-        #console span, #console input {
-            font-family: monospace;
-            white-space: pre;
-        }
-        #console form {
-            display: inline;
-        }
-        .inputLine {
-            font-weight: bold;
-        }
-        .user, .atHost, .host {
-            color: green;
-
-        }
-        #command {
-            outline: none;
-            border: none;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="assets/css/terminal.css">
 </head>
 <body>
 <div id="console">
@@ -76,72 +53,14 @@ HTML;
         ╚███╔███╔╝███████╗██████╔╝         ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗
          ╚══╝╚══╝ ╚══════╝╚═════╝          ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
     </span><br />
-    <?php foreach ($this->data as $data): ?>
-        <?= makeInputLine($data); ?>
-    <?php endforeach; ?>
 
-    <?= makeInputLine($inputData, false); ?>
+    <span id="console-content"></span>
     <span id="command" contenteditable></span>
 </div>
 <script>
-    (function() {
-        const command = document.querySelector('#command');
-        const terminal = document.querySelector('#console');
-        let historyKey = -1;
-        let history = JSON.parse(document.querySelector('#history').getAttribute('value'));
-
-        command.focus();
-
-        command.addEventListener('keydown', function (event) {
-            let changeValue = false;
-            let value = '';
-            if (event.keyCode === 13) {
-                event.preventDefault();
-                terminal.innerHTML += `<form id="consoleForm" method="post"><input type="hidden" name="command" value="${command.innerHTML}" /></form>`;
-                document.querySelector('#consoleForm').submit();
-                return;
-            } else if (event.keyCode === 38) { // key: UP (arrow)
-                console.log(historyKey);
-                event.preventDefault();
-                if (setNewHistoryKey(historyKey + 1)) {
-                    console.log(`New Key: ${historyKey}`)
-                    changeValue = true;
-                    value = history[historyKey];
-                }
-            } else if (event.keyCode === 40) { // key: DOWN (arrow)
-                event.preventDefault();
-                changeValue = true;
-                if (setNewHistoryKey(historyKey - 1)) {
-                    if (historyKey === -1) {
-                        value = '';
-                    } else {
-                        value = history[historyKey];
-                    }
-
-                }
-            }
-
-            if (changeValue && value !== undefined) {
-                command.innerHTML = value;
-            }
-        }, false);
-
-        function setNewHistoryKey(newKey) {
-            if (history[newKey] !== undefined || newKey === -1) {
-                historyKey = newKey;
-                return true;
-            }
-            return false;
-        }
-
-        // Focus input field on document click.
-        // Don't focus when selection is not empty.
-        document.addEventListener('click', function (e) {
-            if (window.getSelection().toString() === '') {
-                command.focus();
-            }
-        }, false);
-    })();
+    let data = '<?= json_encode($this->data) ?>';
+    let promptData = '<?= json_encode($promptData) ?>';
 </script>
+<script src="/assets/js/terminal.js"></script>
 </body>
 </html>

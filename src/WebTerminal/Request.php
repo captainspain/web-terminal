@@ -27,6 +27,10 @@ class Request
         $this->data['get'] = $get;
         $this->data['server'] = $server;
         $this->session = $session;
+
+        if ($this->isFetchRequest()) {
+            $this->data['post'] = json_decode(file_get_contents('php://input'), true);
+        }
     }
 
     /**
@@ -41,6 +45,14 @@ class Request
         return array_key_exists($key, $data)
             ? $data[$key]
             : $default;
+    }
+
+    public function isFetchRequest()
+    {
+        return (
+            isset($this->data['server']['HTTP_REQUEST_BY'])
+            && $this->data['server']['HTTP_REQUEST_BY'] === 'web-terminal'
+        );
     }
 
     /**

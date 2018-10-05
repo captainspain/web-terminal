@@ -51,10 +51,15 @@ class Terminal
      * @param bool $json
      * @return array|mixed|string
      */
-    private function getHistoryFromData($json = false)
+    public function getHistoryFromData($json = false)
     {
         if (empty($this->history)) {
-            $commands = $this->getCommands();
+            $commands = [];
+            foreach ($this->data as $data) {
+                if ($data['command'] && !in_array($data['command'], $commands, true)) {
+                    $commands[] = $data['command'];
+                }
+            }
             $commands = array_reverse($commands);
         } else {
             $commands = $this->history;
@@ -82,7 +87,7 @@ class Terminal
     /**
      * @return array
      */
-    private function getInputData()
+    public function getPromtData()
     {
         return [
             'user' => ($user = get_current_user()),
@@ -95,8 +100,7 @@ class Terminal
 
     /**
      * @param string $command
-     *
-     * TODO: The checks needs to be refactored. Something more readable..
+     * @return array
      */
     private function execute(string $command)
     {
@@ -118,40 +122,9 @@ class Terminal
             $data['response'] = $response;
         }
 
-        $this->data[] = array_merge($this->getInputData(), $data);
-        return;
-    }
+        $this->data[] = array_merge($this->getPromtData(), $data);
 
-    /**
-     * @param string $command
-     * @param array $data
-     */
-    private function execCdCommand($command, &$data)
-    {
-        $path = str_replace('cd ', '', $command);
-        $data['root'] = $this->normalizeRoot(getcwd());
-        $data['response'] = [''];
-        if (chdir($path)) {
-            $this->request->session->set('root', getcwd());
-        } else {
-            $data['response'] = ['sh: 1: cd: test: No such file or directory'];
-        }
-    }
-
-    /**
-     * @param string $command
-     * @param array $data
-     */
-    private function execSudoCommand($command, &$data)
-    {
-        if (env('ENABLE_SUDO', 'false') === 'false') {
-            $data['response'] = ['Error, `sudo` is disabled.'];
-        } else { // USE AT OWN RISK!!
-            $sudoPass = env('SUDO_PASSWORD');
-            $data['response'] = [];
-            $command = str_replace('sudo ', '', $command);
-            exec("echo $sudoPass | sudo -S $command 2>&1", $data['response']);
-        }
+        return $data['response'];
     }
 
     /**
@@ -194,22 +167,36 @@ class Terminal
     private function handlePost()
     {
         $command = $this->request->getPostData('command');
-        $this->execute($command);
+        $responseData = $this->execute($command);
+
+        echo json_encode(['response' => $responseData, 'prompt' => $this->getPromtData(), 'old-command' => $command]);
+        exit();
 
         header("Location: index.php");
         exit();
     }
 
-    /**
-     * Displays the template.
-     */
-    public function output()
+    public function getData($key = null, $default = null)
     {
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        $inputData = $this->getInputData();
-        /** @noinspection PhpIncludeInspection */
-        include_once $this->templatePath;
+        $data = $this->data;
+        if ($key !== null) {
+            $data = array_key_exists($key, $data) ? $data[$key] : null;
+        }
+
+        return $data ?? $default;
     }
+
+
+    // /**
+    //  * Displays the template.
+    //  */
+    // public function output()
+    // {
+    //     /** @noinspection PhpUnusedLocalVariableInspection */
+    //     $promptData = $this->getPromtData();
+    //     /** @noinspection PhpIncludeInspection */
+    //     include_once $this->templatePath;
+    // }
 
     /**
      * Destructor, Saves all data like session and logs.
