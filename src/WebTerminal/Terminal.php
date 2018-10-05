@@ -127,6 +127,38 @@ class Terminal
         return $data['response'];
     }
 
+        /**
+     * @param string $command
+     * @param array $data
+     */
+    private function execCdCommand($command, &$data)
+    {
+        $path = str_replace('cd ', '', $command);
+        $data['root'] = $this->normalizeRoot(getcwd());
+        $data['response'] = [''];
+        if (chdir($path)) {
+            $this->request->session->set('root', getcwd());
+        } else {
+            $data['response'] = ['sh: 1: cd: test: No such file or directory'];
+        }
+    }
+
+        /**
+     * @param string $command
+     * @param array $data
+     */
+    private function execSudoCommand($command, &$data)
+    {
+        if (env('ENABLE_SUDO', 'false') === 'false') {
+            $data['response'] = ['Error, `sudo` is disabled.'];
+        } else { // USE AT OWN RISK!!
+            $sudoPass = env('SUDO_PASSWORD');
+            $data['response'] = [];
+            $command = str_replace('sudo ', '', $command);
+            exec("echo $sudoPass | sudo -S $command 2>&1", $data['response']);
+        }
+    }
+
     /**
      * @param string $root
      * @param string $user
