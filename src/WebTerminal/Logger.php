@@ -4,10 +4,15 @@ namespace CaptainSpain\WebTerminal;
 
 class Logger
 {
-    /** @var array */
+    /**
+     * @var array
+     */
     private $data;
-    /** @var string */
-    private $filePath;
+
+    /**
+     * @var \SplFileObject
+     */
+    private $file;
 
     /**
      * Logger constructor.
@@ -16,7 +21,11 @@ class Logger
      */
     public function __construct(string $filePath)
     {
-        $this->filePath = $filePath;
+        try {
+            $this->file = new \SplFileObject($filePath, 'r+');
+        } catch (\Exception $e) {
+            throw new \InvalidArgumentException('Invalid file path provided');
+        }
         $this->loadData();
     }
 
@@ -25,14 +34,11 @@ class Logger
      */
     private function loadData(): void
     {
-        try {
-            $file = new \SplFileObject($this->filePath);
-            $content = $file->fread($file->getSize());
+        $file = $this->file;
 
-            $this->data = json_decode($content, true) ?? [];
-        } catch (\Exception $e) {
-            $this->data = [];
-        }
+        $content = $file->fread($file->getSize());
+
+        $this->data = json_decode($content, true) ?? [];
     }
 
     /**
@@ -59,19 +65,16 @@ class Logger
      */
     public function save(): void
     {
+        $file = $this->file;
         $data = $this->data;
 
-        try {
-            $file = new \SplFileObject($this->filePath);
-            $file->fwrite(json_encode($data, JSON_FORCE_OBJECT));
-        } catch (\Exception $e) {
-
-        }
+        $file->rewind();
+        $file->fwrite(json_encode($data, JSON_FORCE_OBJECT));
     }
 
     /**
-     * @param $key
-     * @param null $default
+     * @param string $key
+     * @param mixed $default
      * @return mixed
      */
     public function getLast($key, $default = null)

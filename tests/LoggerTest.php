@@ -22,18 +22,17 @@ class LoggerTest extends TestCase
 
     /**
      * @covers \CaptainSpain\WebTerminal\Logger::__construct
-     * @covers \CaptainSpain\WebTerminal\Logger::loadData
      */
     public function testConstructorWithNotReadableFilePath()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid file path provided');
+
         $config = ['foo' => 'bar'];
 
         $file = $this->createFile($config, 0222);
 
-        $logger = new Logger($file->url());
-
-        $this->assertAttributeSame($file->url(), 'filePath', $logger);
-        $this->assertAttributeSame([], 'data', $logger);
+        new Logger($file->url());
     }
 
     /**
@@ -48,7 +47,7 @@ class LoggerTest extends TestCase
 
         $logger = new Logger($file->url());
 
-        $this->assertAttributeSame($file->url(), 'filePath', $logger);
+        $this->assertAttributeInstanceOf(\SplFileObject::class, 'file', $logger);
         $this->assertAttributeSame($config, 'data', $logger);
     }
 
@@ -90,16 +89,19 @@ class LoggerTest extends TestCase
     /**
      * @covers \CaptainSpain\WebTerminal\Logger::__construct
      * @covers \CaptainSpain\WebTerminal\Logger::loadData
+     * @covers \CaptainSpain\WebTerminal\Logger::setData
      * @covers \CaptainSpain\WebTerminal\Logger::save
      */
     public function testSave()
     {
-        $file = $this->createFile([]);
+        $file = $this->createFile(new \stdClass());
+        $this->assertSame(json_encode([], JSON_FORCE_OBJECT), $file->getContent());
 
         $logger = new Logger($file->url());
+        $logger->setData(['bar' => 'foo']);
         $logger->save();
 
-        $this->assertSame(json_encode([]), $file->getContent());
+        $this->assertSame(json_encode(['bar' => 'foo'], JSON_FORCE_OBJECT), $file->getContent());
     }
 
     /**
@@ -122,11 +124,11 @@ class LoggerTest extends TestCase
     }
 
     /**
-     * @param array $config
+     * @param array|object $config
      * @param int|null $permissions
      * @return vfsStreamFile
      */
-    private function createFile(array $config, ?int $permissions = null): vfsStreamFile
+    private function createFile($config, ?int $permissions = null): vfsStreamFile
     {
         return vfsStream::newFile('config', $permissions)
             ->withContent(json_encode($config))

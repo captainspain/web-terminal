@@ -9,9 +9,10 @@ class Session
 
     /**
      * Session constructor.
-     * @param $sessions
+     *
+     * @param array $sessions
      */
-    public function __construct($sessions)
+    public function __construct(array $sessions)
     {
         $this->data = $sessions;
     }
@@ -21,11 +22,11 @@ class Session
      */
     public function isEmpty(): bool
     {
-        return empty($data);
+        return empty($this->data);
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @param null $default
      * @return mixed|null
      */
@@ -40,7 +41,7 @@ class Session
 
     /**
      * @param string $key
-     * @param $value
+     * @param mixed $value
      * @return Session
      */
     public function set(string $key, $value): self
