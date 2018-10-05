@@ -21,7 +21,7 @@ class Session
      */
     public function isEmpty(): bool
     {
-        return empty($data);
+        return empty($this->data);
     }
 
     /**
