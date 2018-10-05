@@ -54,12 +54,7 @@ class Terminal
     private function getHistoryFromData($json = false)
     {
         if (empty($this->history)) {
-            $commands = [];
-            foreach ($this->data as $data) {
-                if ($data['command'] && !in_array($data['command'], $commands, true)) {
-                    $commands[] = $data['command'];
-                }
-            }
+            $commands = $this->getCommands();
             $commands = array_reverse($commands);
         } else {
             $commands = $this->history;
@@ -68,6 +63,20 @@ class Terminal
         return $json === false
             ? $commands
             : htmlspecialchars(json_encode($commands, JSON_FORCE_OBJECT));
+    }
+
+    /**
+     * @return array
+     */
+    private function getCommands()
+    {
+        $commands = [];
+        foreach ($this->data as $data) {
+            if ($data['command'] && !in_array($data['command'], $commands, true)) {
+                $commands[] = $data['command'];
+            }
+        }
+        return $commands;
     }
 
     /**
@@ -97,24 +106,12 @@ class Terminal
             $this->data = [];
             $this->request->session->flush();
             return;
-        } elseif (contains('cd ', $command)) {
-            $path = str_replace('cd ', '', $command);
-            $data['root'] = $this->normalizeRoot(getcwd());
-            $data['response'] = [''];
-            if (chdir($path)) {
-                $this->request->session->set('root', getcwd());
-            } else {
-                $data['response'] = ['sh: 1: cd: test: No such file or directory'];
-            }
+        }
+
+        if (contains('cd ', $command)) {
+            $this->execCdCommand($command, $data);
         } elseif (contains('sudo ', $command)) {
-            if (env('ENABLE_SUDO', 'false') === 'false') {
-                $data['response'] = ['Error, `sudo` is disabled.'];
-            } else { // USE AT OWN RISK!!
-                $sudoPass = env('SUDO_PASSWORD');
-                $data['response'] = [];
-                $command = str_replace('sudo ', '', $command);
-                exec("echo $sudoPass | sudo -S $command 2>&1", $data['response']);
-            }
+            $this->execSudoCommand($command, $data);
         } else {
             $response = [];
             exec("$command 2>&1", $response);
@@ -123,6 +120,38 @@ class Terminal
 
         $this->data[] = array_merge($this->getInputData(), $data);
         return;
+    }
+
+    /**
+     * @param string $command
+     * @param array $data
+     */
+    private function execCdCommand($command, &$data)
+    {
+        $path = str_replace('cd ', '', $command);
+        $data['root'] = $this->normalizeRoot(getcwd());
+        $data['response'] = [''];
+        if (chdir($path)) {
+            $this->request->session->set('root', getcwd());
+        } else {
+            $data['response'] = ['sh: 1: cd: test: No such file or directory'];
+        }
+    }
+
+    /**
+     * @param string $command
+     * @param array $data
+     */
+    private function execSudoCommand($command, &$data)
+    {
+        if (env('ENABLE_SUDO', 'false') === 'false') {
+            $data['response'] = ['Error, `sudo` is disabled.'];
+        } else { // USE AT OWN RISK!!
+            $sudoPass = env('SUDO_PASSWORD');
+            $data['response'] = [];
+            $command = str_replace('sudo ', '', $command);
+            exec("echo $sudoPass | sudo -S $command 2>&1", $data['response']);
+        }
     }
 
     /**
