@@ -36,6 +36,41 @@ if (!function_exists('asset')) {
     }
 }
 
+/**
+ * @param $data
+ * @param bool $fromData
+ * @return string
+ */
+function makeInputLine($data, $fromData = true) : string
+{
+    $command = '';
+    $response = '';
+    $operator = $data['isSudo'] ? '#' : '$';
+    if ($fromData) {
+        $command = $data['command'];
+        if (!contains('cd ', $command)) {
+            $command .= '<br />';
+        }
+        $command = '<span class="command-executed">' . $command . '</span>';
+        $responseData = $data['response'] ?? [];
+        $response = '';
+        foreach ($responseData as $line) {
+            $line = $line === '' ? '&nbsp;' : htmlentities($line);
+            $response .= '<span class="new-line" style="display:block">' . $line . '</span>';
+        }
+        $response = '<span class="response">' . $response . '</span>';
+    }
+
+    return <<<HTML
+<span class="inputLine"><span class="user">{$data['user']}</span><span class="atHost">@</span><span class="host">{$data['host']}</span>:<span class="root">{$data['root']}</span><span class="operator">{$operator}</span>&nbsp;</span>{$command}{$response}
+HTML;
+}
+
+/**
+ * @param $needle
+ * @param $haystack
+ * @return bool
+ */
 function contains($needle, $haystack)
 {
     return strpos($haystack, $needle) !== false;
