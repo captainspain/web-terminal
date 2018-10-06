@@ -10,9 +10,9 @@ class Logger
     private $data;
 
     /**
-     * @var \SplFileObject
+     * @var string
      */
-    private $file;
+    private $filePath;
 
     /**
      * Logger constructor.
@@ -21,11 +21,7 @@ class Logger
      */
     public function __construct(string $filePath)
     {
-        try {
-            $this->file = new \SplFileObject($filePath, 'c+');
-        } catch (\Exception $e) {
-            throw new \RuntimeException('File is not readable');
-        }
+        $this->filePath = $filePath;
         $this->loadData();
     }
 
@@ -34,11 +30,11 @@ class Logger
      */
     private function loadData(): void
     {
-        $file = $this->file;
-
-        $content = $file->fread($file->getSize());
-
-        $this->data = json_decode($content, true) ?? [];
+        if (($json = @file_get_contents($this->filePath)) === false) {
+            $this->data = [];
+            return;
+        }
+        $this->data = json_decode($json, true) ?? [];
     }
 
     /**
@@ -65,13 +61,8 @@ class Logger
      */
     public function save(): void
     {
-        $file = $this->file;
         $data = $this->data;
-
-        if ($file->ftell() !== 0) {
-            $file->rewind();
-        }
-        $file->fwrite(json_encode($data, JSON_FORCE_OBJECT));
+        file_put_contents($this->filePath, json_encode($data, \JSON_FORCE_OBJECT));
     }
 
     /**

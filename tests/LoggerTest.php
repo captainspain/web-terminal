@@ -25,14 +25,13 @@ class LoggerTest extends TestCase
      */
     public function testConstructorWithNotReadableFilePath()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('File is not readable');
-
         $config = ['foo' => 'bar'];
 
         $file = $this->createFile($config, 0222);
 
-        new Logger($file->url());
+        $logger = new Logger($file->url());
+
+        $this->assertAttributeSame([], 'data', $logger);
     }
 
     /**
@@ -47,7 +46,7 @@ class LoggerTest extends TestCase
 
         $logger = new Logger($file->url());
 
-        $this->assertAttributeInstanceOf(\SplFileObject::class, 'file', $logger);
+        $this->assertAttributeSame($file->url(), 'filePath', $logger);
         $this->assertAttributeSame($config, 'data', $logger);
     }
 
