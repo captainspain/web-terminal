@@ -15,11 +15,11 @@ class Request
 
     /**
      * Request constructor.
+     *
      * @param array $post
      * @param array $get
      * @param array $server
      * @param Session $session
-     * @internal param array $request
      */
     public function __construct(array $post, array $get, array $server, Session $session)
     {
@@ -44,11 +44,10 @@ class Request
     }
 
     /**
-     * @param null|string $key
-     * @param mixed $default
+     * @param string|null $key
      * @return mixed
      */
-    public function getPostData($key = null, $default = null)
+    public function getPostData(?string $key = null)
     {
         $post = $this->data['post'];
 
@@ -60,8 +59,8 @@ class Request
     /**
      * @return bool
      */
-    public function isPost()
+    public function isPost(): bool
     {
-        return $this->data['server']['REQUEST_METHOD'] === 'POST';
+        return isset($this->data['server']['REQUEST_METHOD']) && $this->data['server']['REQUEST_METHOD'] === 'POST';
     }
 }

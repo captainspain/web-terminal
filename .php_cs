@@ -7,7 +7,7 @@ $finder = PhpCsFixer\Finder::create()
             ->name('*.php')
             ->ignoreDotFiles(true)
             ->ignoreVCS(true);
-;
+
 return PhpCsFixer\Config::create()
     ->setRules([
         '@PSR1' => true,

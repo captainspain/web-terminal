@@ -17,6 +17,7 @@ class Terminal
 
     /**
      * Terminal constructor.
+     *
      * @param Request $request
      * @param Logger $logger
      * @param string $theme
@@ -45,7 +46,6 @@ class Terminal
             chdir($cwd);
         }
     }
-
 
     /**
      * @param bool $json

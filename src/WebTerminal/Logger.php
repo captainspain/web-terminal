@@ -4,16 +4,22 @@ namespace CaptainSpain\WebTerminal;
 
 class Logger
 {
-    /** @var array */
+    /**
+     * @var array
+     */
     private $data;
-    /** @var string */
+
+    /**
+     * @var string
+     */
     private $filePath;
 
     /**
      * Logger constructor.
-     * @param $filePath
+     *
+     * @param string $filePath
      */
-    public function __construct($filePath)
+    public function __construct(string $filePath)
     {
         $this->filePath = $filePath;
         $this->loadData();
@@ -24,19 +30,17 @@ class Logger
      */
     private function loadData(): void
     {
-        if (($json = file_get_contents($this->filePath)) === false) {
+        if (($json = @file_get_contents($this->filePath)) === false) {
             $this->data = [];
-
             return;
         }
-
         $this->data = json_decode($json, true) ?? [];
     }
 
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }
@@ -58,12 +62,12 @@ class Logger
     public function save(): void
     {
         $data = $this->data;
-        file_put_contents($this->filePath, json_encode($data, JSON_FORCE_OBJECT));
+        file_put_contents($this->filePath, json_encode($data, \JSON_FORCE_OBJECT));
     }
 
     /**
-     * @param $key
-     * @param null $default
+     * @param string $key
+     * @param mixed $default
      * @return mixed
      */
     public function getLast($key, $default = null)
