@@ -21,11 +21,16 @@ if (!function_exists('templates_dir')) {
      */
     function templates_dir(string $path = ''): string
     {
-        return dirname(__DIR__) . '/data/templates' . $path;
+        return dirname(__DIR__) . '/resources/templates' . $path;
     }
 }
 
 function contains($needle, $haystack)
 {
     return strpos($haystack, $needle) !== false;
+}
+
+function asset($type, $file)
+{
+    return "../../resources/assets/$type/$file";
 }
