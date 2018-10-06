@@ -22,9 +22,9 @@ class Logger
     public function __construct(string $filePath)
     {
         try {
-            $this->file = new \SplFileObject($filePath, 'r+');
+            $this->file = new \SplFileObject($filePath, 'c+');
         } catch (\Exception $e) {
-            throw new \InvalidArgumentException('Invalid file path provided');
+            throw new \RuntimeException('File is not readable');
         }
         $this->loadData();
     }
@@ -68,7 +68,9 @@ class Logger
         $file = $this->file;
         $data = $this->data;
 
-        $file->rewind();
+        if ($file->ftell() !== 0) {
+            $file->rewind();
+        }
         $file->fwrite(json_encode($data, JSON_FORCE_OBJECT));
     }
 

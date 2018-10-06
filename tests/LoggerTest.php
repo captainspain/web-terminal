@@ -25,8 +25,8 @@ class LoggerTest extends TestCase
      */
     public function testConstructorWithNotReadableFilePath()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid file path provided');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('File is not readable');
 
         $config = ['foo' => 'bar'];
 
