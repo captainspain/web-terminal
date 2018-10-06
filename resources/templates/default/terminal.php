@@ -35,7 +35,7 @@ HTML;
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><?= env('APP_NAME') ?> - CaptainSpain</title>
 
-    <link rel="stylesheet" href="<?= asset("css", "darcula.css") ?>">
+    <link rel="stylesheet" href="<?= asset('/css/darcula.css') ?>">
 </head>
 <body>
 <div id="console">
@@ -55,6 +55,6 @@ HTML;
     <?= makeInputLine($inputData, false); ?>
     <span id="command" contenteditable></span>
 </div>
-<script type="text/javascript" src="<?= asset('js', 'app.js'); ?>"></script>
+<script type="text/javascript" src="<?= asset('/js/app.js'); ?>"></script>
 </body>
 </html>
