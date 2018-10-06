@@ -25,12 +25,18 @@ if (!function_exists('templates_dir')) {
     }
 }
 
+if (!function_exists('asset')) {
+    /**
+     * @param string $path
+     * @return string
+     */
+    function asset(string $path = '') : string
+    {
+        return '../../resources/assets' . $path;
+    }
+}
+
 function contains($needle, $haystack)
 {
     return strpos($haystack, $needle) !== false;
-}
-
-function asset($type, $file)
-{
-    return "../../resources/assets/$type/$file";
 }
