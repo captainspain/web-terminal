@@ -1,24 +1,51 @@
 (function() {
     const command = document.querySelector('#command');
     const terminal = document.querySelector('#console');
+    const terminalContent = document.querySelector('#console-content');
     let historyKey = -1;
     let history = JSON.parse(document.querySelector('#history').getAttribute('value'));
 
+
     command.focus();
+
+    function executeCommand(commandToExecute) {
+        postData('index.php', {command: commandToExecute})
+            .then(data => setResponse(data))
+            .catch(error => console.error(error));
+
+        command.innerHTML = '';
+        if (commandToExecute === 'clear') {
+            location.reload();
+        }
+        updateHistory(commandToExecute);
+    }
+
+    function updateHistory(commandToAdd) {
+        if (commandToAdd === history[0]) return;
+        let newHistory = {0: commandToAdd};
+        for (var key in history) {
+            key = parseInt(key);
+            let newKey = key + 1;
+            newHistory[newKey] = history[key];
+        }
+        history = newHistory;
+        historyKey = -1;
+    }
+
+    function setResponse(response) {
+        terminalContent.innerHTML += response;
+    }
 
     command.addEventListener('keydown', function (event) {
         let changeValue = false;
         let value = '';
         if (event.keyCode === 13) {
             event.preventDefault();
-            terminal.innerHTML += `<form id="consoleForm" method="post"><input type="hidden" name="command" value="${command.innerHTML}" /></form>`;
-            document.querySelector('#consoleForm').submit();
+            executeCommand(command.innerHTML);
             return;
         } else if (event.keyCode === 38) { // key: UP (arrow)
-            console.log(historyKey);
             event.preventDefault();
             if (setNewHistoryKey(historyKey + 1)) {
-                console.log(`New Key: ${historyKey}`)
                 changeValue = true;
                 value = history[historyKey];
             }
@@ -31,7 +58,6 @@
                 } else {
                     value = history[historyKey];
                 }
-
             }
         }
 
@@ -56,3 +82,20 @@
         }
     }, false);
 })();
+
+function postData (url = '', data = {}) {
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Request-By": "web-terminal",
+        },
+        redirect: 'follow',
+        referrer: 'no-referrer',
+        body: JSON.stringify(data)
+    })
+        .then(response => response.text());
+}

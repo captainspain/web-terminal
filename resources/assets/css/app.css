@@ -1,0 +1,14 @@
+html {
+    height: 100%;
+    margin: 0;
+}
+body {
+    padding: 5px;
+}
+#command {
+    border: none;
+    display: inline-block;
+}
+.response, .response > .line {
+    display:block;
+}
