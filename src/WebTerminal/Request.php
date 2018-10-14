@@ -27,6 +27,10 @@ class Request
         $this->data['get'] = $get;
         $this->data['server'] = $server;
         $this->session = $session;
+
+        if ($this->isFetchRequest()) {
+            $this->data['post'] = json_decode(file_get_contents('php://input'), true);
+        }
     }
 
     /**
@@ -62,5 +66,13 @@ class Request
     public function isPost(): bool
     {
         return isset($this->data['server']['REQUEST_METHOD']) && $this->data['server']['REQUEST_METHOD'] === 'POST';
+    }
+
+    public function isFetchRequest()
+    {
+        return (
+            isset($this->data['server']['HTTP_REQUEST_BY'])
+            && $this->data['server']['HTTP_REQUEST_BY'] === 'web-terminal'
+        );
     }
 }

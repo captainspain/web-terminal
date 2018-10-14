@@ -118,8 +118,10 @@ class Terminal
             $data['response'] = $response;
         }
 
-        $this->data[] = array_merge($this->getInputData(), $data);
-        return;
+        $data = array_merge($this->getInputData(), $data);
+        $this->data[] = $data;
+
+        return $data;
     }
 
     /**
@@ -133,6 +135,7 @@ class Terminal
         $data['response'] = [''];
         if (chdir($path)) {
             $this->request->session->set('root', getcwd());
+            $data['root'] = $this->normalizeRoot(getcwd());
         } else {
             $data['response'] = ['sh: 1: cd: test: No such file or directory'];
         }
@@ -194,7 +197,16 @@ class Terminal
     private function handlePost()
     {
         $command = $this->request->getPostData('command');
-        $this->execute($command);
+
+        $result = $this->execute($command);
+
+        if ($this->request->isFetchRequest() && $result !== null) {
+            $outputter = new TerminalOutput($result);
+            echo ' ' . $outputter->getOldCommand()
+                . $outputter->getResponse()
+                . $outputter->getPrompt();
+            exit();
+        }
 
         header("Location: index.php");
         exit();
